@@ -188,17 +188,6 @@ class ChewieState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
-    // if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
-    //   /// Optional user preferred settings
-    //   SystemChrome.setEnabledSystemUIMode(
-    //     SystemUiMode.manual,
-    //     overlays: widget.controller.systemOverlaysOnEnterFullScreen,
-    //   );
-    // } else {
-    //   /// Default behavior
-    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
-    // }
-
     if (widget.controller.deviceOrientationsOnEnterFullScreen != null) {
       /// Optional user preferred settings
       SystemChrome.setPreferredOrientations(
@@ -265,6 +254,7 @@ class ChewieController extends ChangeNotifier {
     this.showControls = true,
     this.transformationController,
     this.zoomAndPan = false,
+    this.fit = BoxFit.contain,
     this.maxScale = 2.5,
     this.subtitle,
     this.subtitleBuilder,
@@ -471,6 +461,9 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Will fallback to fitting within the space allowed.
   final double? aspectRatio;
+
+  /// The fit type of the video.
+  final BoxFit fit;
 
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
