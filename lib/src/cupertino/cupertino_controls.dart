@@ -346,6 +346,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Widget _buildHitArea() {
+    final bool isPreview = chewieController.previewSettings?.isPreview ?? false;
     final bool isFinished = _latestValue.position >= _latestValue.duration;
     final bool showPlayButton =
         widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
@@ -355,19 +356,34 @@ class _CupertinoControlsState extends State<CupertinoControls>
           ? _cancelAndRestartTimer
           : () {
               _hideTimer?.cancel();
-
               setState(() {
                 notifier.hideStuff = false;
               });
             },
-      child: CenterPlayButton(
-        backgroundColor: widget.backgroundColor,
-        iconColor: widget.iconColor,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ),
+      child: isPreview
+          ? Visibility(
+            visible: isFinished,
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0),
+                  child: ColoredBox(
+                    color: widget.backgroundColor,
+                    child: chewieController.previewSettings!.previewCompletedBuilder(context),
+                  ),
+                ),
+              ),
+            ),
+          )
+          : CenterPlayButton(
+              backgroundColor: widget.backgroundColor,
+              iconColor: widget.iconColor,
+              isFinished: isFinished,
+              isPlaying: controller.value.isPlaying,
+              show: showPlayButton,
+              onPressed: _playPause,
+            ),
     );
   }
 
@@ -455,7 +471,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Widget _buildRemaining(Color iconColor) {
-    final position = _latestValue.duration - _latestValue.position;
+    final duration =
+        _chewieController?.previewSettings?.duration ?? _latestValue.duration;
+    final position = duration - _latestValue.position;
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),

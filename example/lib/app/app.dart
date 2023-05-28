@@ -6,6 +6,42 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
+const String src1 = "https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4";
+const String src2 = "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4";
+const String src3 = "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4";
+
+List<String> srcs = [
+  src1,
+  src2,
+  src3,
+];
+
+Map<String, PreviewSettings> previewSettings = {
+  src3: const PreviewSettings(
+    isPreview: true,
+    duration: Duration(seconds: 30),
+    previewCompletedBuilder: _buildPreviewCompleted,
+  ),
+};
+
+Widget _buildPreviewCompleted(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(20.0),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        Text(
+          'Preview Completed',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 class ChewieDemo extends StatefulWidget {
   const ChewieDemo({
     Key? key,
@@ -41,12 +77,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
     super.dispose();
   }
 
-  List<String> srcs = [
-    "https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4",
-    "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
-    "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
-  ];
-
   Future<void> initializePlayer() async {
     _videoPlayerController1 =
         VideoPlayerController.network(srcs[currPlayIndex]);
@@ -61,20 +91,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   void _createChewieController() {
-    // final subtitles = [
-    //     Subtitle(
-    //       index: 0,
-    //       start: Duration.zero,
-    //       end: const Duration(seconds: 10),
-    //       text: 'Hello from subtitles',
-    //     ),
-    //     Subtitle(
-    //       index: 0,
-    //       start: const Duration(seconds: 10),
-    //       end: const Duration(seconds: 20),
-    //       text: 'Whats up? :)',
-    //     ),
-    //   ];
 
     final subtitles = [
       Subtitle(
@@ -116,7 +132,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       looping: true,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-
+      previewSettings: previewSettings[srcs[currPlayIndex]],
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
@@ -189,9 +205,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     ? Chewie(
                         controller: _chewieController!,
                       )
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                           SizedBox(height: 20),
                           Text('Loading'),

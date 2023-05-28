@@ -144,6 +144,7 @@ class StaticProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chewieController = ChewieController.of(context);
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
@@ -151,6 +152,7 @@ class StaticProgressBar extends StatelessWidget {
       child: CustomPaint(
         painter: _ProgressBarPainter(
           value: value,
+          totalDuration: chewieController.previewSettings?.duration,
           draggableValue: context.calcRelativePosition(
             value.duration,
             latestDraggableOffset,
@@ -173,7 +175,8 @@ class _ProgressBarPainter extends CustomPainter {
     required this.handleHeight,
     required this.drawShadow,
     required this.draggableValue,
-  });
+    Duration? totalDuration,
+  }) : totalDuration = totalDuration ?? value.duration;
 
   VideoPlayerValue value;
   ChewieProgressColors colors;
@@ -182,6 +185,8 @@ class _ProgressBarPainter extends CustomPainter {
   final double handleHeight;
   final bool drawShadow;
   final Duration draggableValue;
+
+  final Duration totalDuration;
 
   @override
   bool shouldRepaint(CustomPainter painter) {
@@ -208,12 +213,12 @@ class _ProgressBarPainter extends CustomPainter {
     final double playedPartPercent = (draggableValue != Duration.zero
             ? draggableValue.inMilliseconds
             : value.position.inMilliseconds) /
-        value.duration.inMilliseconds;
+        totalDuration.inMilliseconds;
     final double playedPart =
         playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (final DurationRange range in value.buffered) {
-      final double start = range.startFraction(value.duration) * size.width;
-      final double end = range.endFraction(value.duration) * size.width;
+      final double start = range.startFraction(totalDuration) * size.width;
+      final double end = range.endFraction(totalDuration) * size.width;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromPoints(

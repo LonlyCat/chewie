@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
+import 'package:chewie/src/models/preview_settings.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
@@ -267,6 +268,7 @@ class ChewieController extends ChangeNotifier {
     this.allowPlaybackSpeedChanging = true,
     this.useRootNavigator = true,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+    this.previewSettings,
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
@@ -305,6 +307,7 @@ class ChewieController extends ChangeNotifier {
     bool? zoomAndPan,
     double? maxScale,
     Subtitles? subtitle,
+    PreviewSettings? previewSettings,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
     Widget? customControls,
     Widget Function(BuildContext, String)? errorBuilder,
@@ -350,6 +353,7 @@ class ChewieController extends ChangeNotifier {
           showControlsOnInitialize ?? this.showControlsOnInitialize,
       showOptions: showOptions ?? this.showOptions,
       optionsBuilder: optionsBuilder ?? this.optionsBuilder,
+      previewSettings: previewSettings ?? this.previewSettings,
       additionalOptions: additionalOptions ?? this.additionalOptions,
       showControls: showControls ?? this.showControls,
       subtitle: subtitle ?? this.subtitle,
@@ -404,6 +408,9 @@ class ChewieController extends ChangeNotifier {
     BuildContext context,
     List<OptionItem> chewieOptions,
   )? optionsBuilder;
+
+  /// 视频预览配置，用于试看功能
+  final PreviewSettings? previewSettings;
 
   /// Add your own additional options on top of chewie options
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
@@ -543,7 +550,8 @@ class ChewieController extends ChangeNotifier {
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
   Future<dynamic> _initialize() async {
-    await videoPlayerController.setLooping(looping);
+    bool isPreview = previewSettings?.isPreview ?? false;
+    await videoPlayerController.setLooping(isPreview ? false : looping);
 
     if ((autoInitialize || autoPlay) &&
         !videoPlayerController.value.isInitialized) {
